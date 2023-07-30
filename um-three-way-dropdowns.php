@@ -2,7 +2,7 @@
 /**
  * Plugin Name:     Ultimate Member - Three Way Dropdown options
  * Description:     Extension to Ultimate Member for defining three way dropdown options in a spreadsheet saved as a CSV file.
- * Version:         2.0.0
+ * Version:         2.1.0
  * Requires PHP:    7.4
  * Author:          Miss Veronica
  * License:         GPL v2 or later
@@ -23,9 +23,9 @@ Class UM_Three_Way_Dropdowns {
     public $mid_level = array();
     public $btm_level = array();
 
-    public $cache_top = false;
-    public $cache_mid = false;
-    public $cache_btm = false;
+    public $cache_top;
+    public $cache_mid;
+    public $cache_btm;
 
     public $number_files = 0;
     public $rows_files   = 6;
@@ -35,11 +35,33 @@ Class UM_Three_Way_Dropdowns {
         add_filter( 'um_settings_structure', array( $this, 'um_settings_structure_three_way_dropdowns' ), 10, 1 );
     }
 
+    public function update_cache_option( $option_name, $option_value ) {
+
+        $current_value = get_option( $option_name );
+
+        if ( $current_value !== false ) {
+
+            if ( $current_value === $option_value ) {
+                return false;
+
+            } else {
+            
+                update_option( $option_name, $option_value );
+                return true;
+            }
+
+        } else {
+
+            add_option( $option_name, $option_value, null, 'no' );
+            return true;
+        }
+    }
+
     public function cache_update_current_csv_files() {
 
-        $this->cache_top = update_option( 'three_way_dropdowns_top', $this->top_level, false );
-        $this->cache_mid = update_option( 'three_way_dropdowns_mid', $this->mid_level, false );
-        $this->cache_btm = update_option( 'three_way_dropdowns_btm', $this->btm_level, false );
+        $this->cache_top = $this->update_cache_option( 'three_way_dropdowns_top', $this->top_level );
+        $this->cache_mid = $this->update_cache_option( 'three_way_dropdowns_mid', $this->mid_level );
+        $this->cache_btm = $this->update_cache_option( 'three_way_dropdowns_btm', $this->btm_level );
     }
 
     public function read_current_csv_files() {
@@ -49,54 +71,58 @@ Class UM_Three_Way_Dropdowns {
         if ( ! empty( $csv_files )) {
             $this->rows_files = count( $csv_files );
 
-            $csv_columns = array_map( 'sanitize_text_field', array_map( 'trim', UM()->options()->get( 'um_three_way_dropdowns_columns' )));
-            if (  in_array( count( $csv_columns ), array( 2, 3 ))) {
+            $csv_columns = UM()->options()->get( 'um_three_way_dropdowns_columns' );
+            if ( ! empty( $csv_columns )) {
 
-                foreach( $csv_files as $csv_file ) {
+                $csv_columns = array_map( 'sanitize_text_field', array_map( 'trim', $csv_columns ));
+                if (  in_array( count( $csv_columns ), array( 2, 3 ))) {
 
-                    $csv_file = WP_CONTENT_DIR . '/uploads/ultimatemember/threewaydropdowns/' . $csv_file;
-                    if ( file_exists( $csv_file ) && is_file( $csv_file )) {
+                    foreach( $csv_files as $csv_file ) {
 
-                        $this->number_files++;
-                        $csv_content = file_get_contents( $csv_file );
+                        $csv_file = WP_CONTENT_DIR . '/uploads/ultimatemember/threewaydropdowns/' . $csv_file;
+                        if ( file_exists( $csv_file ) && is_file( $csv_file )) {
 
-                        if ( ! empty( $csv_content )) {
+                            $this->number_files++;
+                            $csv_content = file_get_contents( $csv_file );
 
-                            $csv_contents = array_map( 'sanitize_text_field', array_map( 'trim', explode( "\n", $csv_content )));
+                            if ( ! empty( $csv_content )) {
 
-                            $top = '';
-                            $mid = '';
+                                $csv_contents = array_map( 'sanitize_text_field', array_map( 'trim', explode( "\n", $csv_content )));
 
-                            foreach( $csv_contents as $csv_content ) {
+                                $top = '';
+                                $mid = '';
 
-                                $csv_row_item = array_map( 'sanitize_text_field', array_map( 'trim', explode( ';', $csv_content )));
+                                foreach( $csv_contents as $csv_content ) {
 
-                                if ( ! empty( $csv_row_item[$csv_columns[0]]) || $top != $csv_row_item[$csv_columns[0]] ) {
+                                    $csv_row_item = array_map( 'sanitize_text_field', array_map( 'trim', explode( ';', $csv_content )));
 
-                                    $top = $csv_row_item[$csv_columns[0]];
-                                    $mid = $csv_row_item[$csv_columns[1]];
-                                    $btm = $csv_row_item[$csv_columns[2]];
+                                    if ( ! empty( $csv_row_item[$csv_columns[0]]) || $top != $csv_row_item[$csv_columns[0]] ) {
 
-                                    $this->top_level[$top] = $top;
-                                    $this->mid_level[$top][$mid] = $mid;
-                                    $this->btm_level[$mid][$btm] = $btm;
-
-                                } else {
-
-                                    if ( ! empty( $csv_row_item[$csv_columns[1]]) || $mid != $csv_row_item[$csv_columns[1]] ) {
-
+                                        $top = $csv_row_item[$csv_columns[0]];
                                         $mid = $csv_row_item[$csv_columns[1]];
                                         $btm = $csv_row_item[$csv_columns[2]];
 
+                                        $this->top_level[$top] = $top;
                                         $this->mid_level[$top][$mid] = $mid;
                                         $this->btm_level[$mid][$btm] = $btm;
 
                                     } else {
 
-                                        if ( ! empty( $csv_row_item[$csv_columns[2]] )) {
+                                        if ( ! empty( $csv_row_item[$csv_columns[1]]) || $mid != $csv_row_item[$csv_columns[1]] ) {
 
+                                            $mid = $csv_row_item[$csv_columns[1]];
                                             $btm = $csv_row_item[$csv_columns[2]];
+
+                                            $this->mid_level[$top][$mid] = $mid;
                                             $this->btm_level[$mid][$btm] = $btm;
+
+                                        } else {
+
+                                            if ( ! empty( $csv_row_item[$csv_columns[2]] )) {
+
+                                                $btm = $csv_row_item[$csv_columns[2]];
+                                                $this->btm_level[$mid][$btm] = $btm;
+                                            }
                                         }
                                     }
                                 }
@@ -265,3 +291,4 @@ UM()->classes['um_three_way_dropdowns'] = new UM_Three_Way_Dropdowns();
 
         return $dropdown_option;
     }
+
