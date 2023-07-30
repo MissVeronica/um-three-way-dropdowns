@@ -2,7 +2,7 @@
 /**
  * Plugin Name:     Ultimate Member - Three Way Dropdown options
  * Description:     Extension to Ultimate Member for defining three way dropdown options in a spreadsheet saved as a CSV file.
- * Version:         2.2.0
+ * Version:         2.3.0
  * Requires PHP:    7.4
  * Author:          Miss Veronica
  * License:         GPL v2 or later
@@ -29,6 +29,8 @@ Class UM_Three_Way_Dropdowns {
 
     public $number_files = 0;
     public $rows_files   = 6;
+
+    public $notice = array();
 
     function __construct() {
 
@@ -81,70 +83,122 @@ Class UM_Three_Way_Dropdowns {
                 $csv_columns = array_map( 'sanitize_text_field', array_map( 'trim', $csv_columns ));
                 if (  in_array( count( $csv_columns ), array( 2, 3 ))) {
 
-                    foreach( $csv_files as $csv_file ) {
+                    $separators = array( 
+                                        'colon'     => ':',
+                                        'semicolon' => ';',
+                                        'comma'     => ',',
+                                    );
 
-                        $csv_file = WP_CONTENT_DIR . '/uploads/ultimatemember/threewaydropdowns/' . $csv_file;
-                        if ( file_exists( $csv_file ) && is_file( $csv_file )) {
+                    $separator = UM()->options()->get( 'um_three_way_dropdowns_separator' );
 
-                            $this->number_files++;
-                            $csv_content = file_get_contents( $csv_file );
+                    if ( array_key_exists( $separator, $separators )) {
+                        $separator = $separators[$separator];
+                    } else {
+                        $separator = '';
+                    } 
 
-                            if ( ! empty( $csv_content )) {
+                    if ( ! empty( $separator )) {
 
-                                if ( strpos( $csv_content, "\n" ) !== false ) {
-                                    $terminator = "\n";
-                                } else {
-                                    $terminator = "\r";
-                                }
+                        foreach( $csv_files as $csv_file_name ) {
 
-                                $csv_contents = array_map( 'sanitize_text_field', array_map( 'trim', explode( $terminator, $csv_content )));
+                            if ( empty( $csv_file_name )) {
+                                continue;
+                            }
 
-                                if ( UM()->options()->get( 'um_three_way_dropdowns_header' ) == 1 ) {
-                                    unset( $csv_contents[0] );
-                                }
+                            $csv_file = WP_CONTENT_DIR . '/uploads/ultimatemember/threewaydropdowns/' . $csv_file_name;
+                            if ( file_exists( $csv_file ) && is_file( $csv_file )) {
 
-                                $top = '';
-                                $mid = '';
+                                $this->number_files++;
+                                $csv_content = file_get_contents( $csv_file );
 
-                                foreach( $csv_contents as $key => $csv_content ) {
+                                if ( ! empty( $csv_content )) {
 
-                                    $csv_row_item = array_map( 'sanitize_text_field', array_map( 'trim', explode( ';', $csv_content )));
+                                    if ( strpos( $csv_content, $separator ) !== false ) {
 
-                                    if ( ! empty( $csv_row_item[$csv_columns[0]]) || $top != $csv_row_item[$csv_columns[0]] ) {
+                                        if ( strpos( $csv_content, "\n" ) !== false ) {
+                                            $terminator = "\n";
+                                        } else {
+                                            $terminator = "\r";
+                                        }
 
-                                        $top = $csv_row_item[$csv_columns[0]];
-                                        $mid = $csv_row_item[$csv_columns[1]];
-                                        $btm = $csv_row_item[$csv_columns[2]];
+                                        $csv_contents = array_map( 'sanitize_text_field', array_map( 'trim', explode( $terminator, $csv_content )));
 
-                                        $this->top_level[$top] = $top;
-                                        $this->mid_level[$top][$mid] = $mid;
-                                        $this->btm_level[$mid][$btm] = $btm;
+                                        if ( UM()->options()->get( 'um_three_way_dropdowns_header' ) == 1 ) {
+                                            unset( $csv_contents[0] );
+                                        }
+
+                                        $top = '';
+                                        $mid = '';
+
+                                        foreach( $csv_contents as $key => $csv_content ) {
+
+                                            $csv_row_item = array_map( 'sanitize_text_field', array_map( 'trim', explode( $separator, $csv_content )));
+
+                                            if ( ! empty( $csv_row_item[$csv_columns[0]]) || $top != $csv_row_item[$csv_columns[0]] ) {
+
+                                                $top = $csv_row_item[$csv_columns[0]];
+                                                $mid = $csv_row_item[$csv_columns[1]];
+                                                $btm = $csv_row_item[$csv_columns[2]];
+
+                                                $this->top_level[$top] = $top;
+                                                $this->mid_level[$top][$mid] = $mid;
+                                                $this->btm_level[$mid][$btm] = $btm;
+
+                                            } else {
+
+                                                if ( ! empty( $csv_row_item[$csv_columns[1]]) || $mid != $csv_row_item[$csv_columns[1]] ) {
+
+                                                    $mid = $csv_row_item[$csv_columns[1]];
+                                                    $btm = $csv_row_item[$csv_columns[2]];
+
+                                                    $this->mid_level[$top][$mid] = $mid;
+                                                    $this->btm_level[$mid][$btm] = $btm;
+
+                                                } else {
+
+                                                    if ( ! empty( $csv_row_item[$csv_columns[2]] )) {
+
+                                                        $btm = $csv_row_item[$csv_columns[2]];
+                                                        $this->btm_level[$mid][$btm] = $btm;
+                                                    }
+                                                }
+                                            }
+                                        }
 
                                     } else {
 
-                                        if ( ! empty( $csv_row_item[$csv_columns[1]]) || $mid != $csv_row_item[$csv_columns[1]] ) {
-
-                                            $mid = $csv_row_item[$csv_columns[1]];
-                                            $btm = $csv_row_item[$csv_columns[2]];
-
-                                            $this->mid_level[$top][$mid] = $mid;
-                                            $this->btm_level[$mid][$btm] = $btm;
-
-                                        } else {
-
-                                            if ( ! empty( $csv_row_item[$csv_columns[2]] )) {
-
-                                                $btm = $csv_row_item[$csv_columns[2]];
-                                                $this->btm_level[$mid][$btm] = $btm;
-                                            }
-                                        }
+                                        $this->notice[] = sprintf( __( 'CSV file field separator wrong in file "%s"', 'ultimate-member' ), $csv_file_name );
                                     }
+
+                                } else {
+
+                                    $this->notice[] = sprintf( __( 'CSV file "%s" is empty', 'ultimate-member' ), $csv_file_name );
                                 }
+
+                            } else {
+
+                                $this->notice[] = sprintf( __( 'CSV file "%s" not found', 'ultimate-member' ), $csv_file_name );
                             }
                         }
+
+                    } else {
+
+                        $this->notice[] = __( 'CSV file field separator missing', 'ultimate-member' );
                     }
+
+                } else {
+
+                    $this->notice[] = __( 'Wrong number of CSV file columns selected', 'ultimate-member' );
                 }
+
+            } else {
+
+                $this->notice[] = __( 'No CSV file columns selected', 'ultimate-member' );
             }
+
+        } else {
+
+            $this->notice[] = __( 'No CSV files', 'ultimate-member' );
         }
     }
 
@@ -157,7 +211,13 @@ Class UM_Three_Way_Dropdowns {
 
         $response = microtime(true) - $start;
 
-        $description = __( 'Cache status:', 'ultimate-member' );
+        $description = '';
+        $notice = implode( '<br>', $this->notice );
+        if ( ! empty( $notice )) {
+            $description .= __( 'Errors:', 'ultimate-member' );
+            $description .= '<br>' . $notice . '<br>';
+        }
+        $description .= __( 'Cache status:', 'ultimate-member' );
         $description .= '<br>' . sprintf( __( '%d CSV files were parsed and cached in %f seconds', 'ultimate-member' ), $this->number_files, $response );
 
         $description .= '<br>' . __( 'Top:', 'ultimate-member' );
@@ -247,6 +307,19 @@ Class UM_Three_Way_Dropdowns {
             'tooltip'       => __( 'Click if you have a header line in the first line of the CSV files.', 'ultimate-member' ),
             );
 
+        $settings_structure['misc']['fields'][] = array(
+            'id'            => 'um_three_way_dropdowns_separator',
+            'type'          => 'select',
+            'size'          => 'small',
+            'options'       => array(   ''           => '',
+                                        'comma'      => 'Comma',
+                                        'colon'      => 'Colon',
+                                        'semicolon'  => 'Semicolon',                                        
+                                    ),
+            'label'         => __( 'Three Way Dropdowns - CSV File field separator', 'ultimate-member' ),
+            'tooltip'       => __( 'Select the separator character.', 'ultimate-member' ),
+            );
+
         return $settings_structure;
     }
 }
@@ -303,7 +376,7 @@ UM()->classes['um_three_way_dropdowns'] = new UM_Three_Way_Dropdowns();
 
             return $all_options;
         }
-        
+
         $dropdown_option = isset( $dropdown_options[$parent_option] ) ? $dropdown_options[$parent_option] : false;
 
         if ( empty( $dropdown_option )) {
@@ -312,4 +385,5 @@ UM()->classes['um_three_way_dropdowns'] = new UM_Three_Way_Dropdowns();
 
         return $dropdown_option;
     }
+
 
