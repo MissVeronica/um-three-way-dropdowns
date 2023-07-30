@@ -2,7 +2,7 @@
 /**
  * Plugin Name:     Ultimate Member - Three Way Dropdown options
  * Description:     Extension to Ultimate Member for defining three way dropdown options in a spreadsheet saved as a CSV file.
- * Version:         2.1.0
+ * Version:         2.2.0
  * Requires PHP:    7.4
  * Author:          Miss Veronica
  * License:         GPL v2 or later
@@ -32,7 +32,10 @@ Class UM_Three_Way_Dropdowns {
 
     function __construct() {
 
-        add_filter( 'um_settings_structure', array( $this, 'um_settings_structure_three_way_dropdowns' ), 10, 1 );
+        if ( is_admin() && ! defined( 'DOING_AJAX' )) {
+
+            add_filter( 'um_settings_structure', array( $this, 'um_settings_structure_three_way_dropdowns' ), 10, 1 );
+        }
     }
 
     public function update_cache_option( $option_name, $option_value ) {
@@ -62,6 +65,7 @@ Class UM_Three_Way_Dropdowns {
         $this->cache_top = $this->update_cache_option( 'three_way_dropdowns_top', $this->top_level );
         $this->cache_mid = $this->update_cache_option( 'three_way_dropdowns_mid', $this->mid_level );
         $this->cache_btm = $this->update_cache_option( 'three_way_dropdowns_btm', $this->btm_level );
+
     }
 
     public function read_current_csv_files() {
@@ -87,12 +91,22 @@ Class UM_Three_Way_Dropdowns {
 
                             if ( ! empty( $csv_content )) {
 
-                                $csv_contents = array_map( 'sanitize_text_field', array_map( 'trim', explode( "\n", $csv_content )));
+                                if ( strpos( $csv_content, "\n" ) !== false ) {
+                                    $terminator = "\n";
+                                } else {
+                                    $terminator = "\r";
+                                }
+
+                                $csv_contents = array_map( 'sanitize_text_field', array_map( 'trim', explode( $terminator, $csv_content )));
+
+                                if ( UM()->options()->get( 'um_three_way_dropdowns_header' ) == 1 ) {
+                                    unset( $csv_contents[0] );
+                                }
 
                                 $top = '';
                                 $mid = '';
 
-                                foreach( $csv_contents as $csv_content ) {
+                                foreach( $csv_contents as $key => $csv_content ) {
 
                                     $csv_row_item = array_map( 'sanitize_text_field', array_map( 'trim', explode( ';', $csv_content )));
 
@@ -224,6 +238,13 @@ Class UM_Three_Way_Dropdowns {
                                     ),
             'label'         => __( 'Three Way Dropdowns - CSV File three spreadsheet columns', 'ultimate-member' ),
             'tooltip'       => __( 'Select the three columns in the spreadsheet where you have Top, Middle and Bottom options.', 'ultimate-member' ),
+            );
+
+        $settings_structure['misc']['fields'][] = array(
+            'id'            => 'um_three_way_dropdowns_header',
+            'type'          => 'checkbox',
+            'label'         => __( 'Three Way Dropdowns - CSV File header line remove', 'ultimate-member' ),
+            'tooltip'       => __( 'Click if you have a header line in the first line of the CSV files.', 'ultimate-member' ),
             );
 
         return $settings_structure;
