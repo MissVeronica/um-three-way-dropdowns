@@ -1,13 +1,17 @@
 # Ultimate Member - Three Way Dropdown options
-Extension to Ultimate Member for defining three way dropdown options in a spreadsheet saved as a CSV file.
-Create the CSV file with an app which can export a file with CSV format like Excel or LibreOffice etc.
-Only single select dropdowns are supported.
+Extension to Ultimate Member for defining three way dropdown options in spreadsheets saved as CSV files.
+Create the CSV files with an app which can export a file with CSV format like Excel or LibreOffice etc.
+Only UM Form's single select dropdowns are supported.
 
 ## CSV file format
 1. Three columns one column for each of the three levels https://imgur.com/a/gqXH9Fo
 2. CSV file field separator ;
-3. Upload the CSV file with the name "dropdowns.csv"
-4. Create and upload the CSV file to this folder:  .../wp-content/uploads/ultimatemember/threewaydropdowns/
+3. Create and upload the CSV files to this folder:  .../wp-content/uploads/ultimatemember/threewaydropdowns/
+
+## UM Settings in tab Misc
+1. Three Way Dropdowns - CSV File Names (one name per line) - Enter one CSV file name per line.
+2. Three Way Dropdowns - CSV File three spreadsheet columns - Select the three columns in the spreadsheet where you have Top, Middle and Bottom options.
+3. https://imgur.com/a/MI4rUVw
 
 ## UM Form Settings
 1. Callback dropdown top level: get_custom_top_list_dropdown
@@ -16,10 +20,11 @@ Only single select dropdowns are supported.
 4. Examples with: State, Section, Group https://imgur.com/a/maYaqwd
 
 ## Test file
-1. See the file "dropdowns.csv" in the plugin directory: um-three-way-dropdowns-main
+1. Use the file "dropdowns.csv" in the plugin directory: um-three-way-dropdowns-main
+2. Columns A, B, C are used in the spreadsheet  
 
 ## Updates
-None
+Version 2.0.0 Multiple CSV files and CSV spreadsheet column selections.
 
 ## Installation
 1. Install by downloading the plugin ZIP file and install as a new Plugin, which you upload in WordPress -> Plugins -> Add New -> Upload Plugin.
