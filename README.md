@@ -11,7 +11,8 @@ Only UM Form's single select dropdowns are supported.
 ## UM Settings in tab Misc
 1. Three Way Dropdowns - CSV File Names (one name per line) - Enter one CSV file name per line.
 2. Three Way Dropdowns - CSV File three spreadsheet columns - Select the three columns in the spreadsheet where you have Top, Middle and Bottom options.
-3. https://imgur.com/a/MI4rUVw
+3. Three Way Dropdowns - CSV File header line remove - Click if you have a header line in the first line of the CSV files.
+4. https://imgur.com/a/MI4rUVw
 
 ## UM Form Settings
 1. Callback dropdown top level: get_custom_top_list_dropdown
@@ -25,7 +26,8 @@ Only UM Form's single select dropdowns are supported.
 
 ## Updates
 1. Version 2.0.0 Multiple CSV files being cached and CSV spreadsheet column selections.
-2. Version 2.1.0 Bug fixing when plugin first run,
+2. Version 2.1.0 Bug fixing when plugin first run.
+3. Version 2.2.0 Header line removal, line terminator update
 
 ## Installation
 1. Install by downloading the plugin ZIP file and install as a new Plugin, which you upload in WordPress -> Plugins -> Add New -> Upload Plugin.
