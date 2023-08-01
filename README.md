@@ -14,7 +14,7 @@ Only UM Form's single select dropdowns are supported.
 1. Select the Top dropdown's "Label - meta_key" - The Middle dropdown will rely on the Top parent meta_key for Options selection
 2. Select the Middle dropdown's "Label - meta_key" - The Bottom dropdown will rely on the Middle parent meta_key for Options selection
 3. CSV File Names (one name per line) - Enter one CSV file name per line.
-4. CSV File three spreadsheet columns - Select the three columns in the spreadsheet where you have Top, Middle and Bottom options.
+4. CSV File spreadsheet select two or three columns - Select the two or three columns in the spreadsheet where you have Top, Middle and Bottom options.
 5. CSV File header line remove - Click if you have a header line in the first line of the CSV files.
 6. CSV File field separator - Select the separator character.
 7. https://imgur.com/a/2PmljWx
