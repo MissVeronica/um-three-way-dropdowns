@@ -4,7 +4,7 @@ Create the CSV files with an app which can export a file with CSV format like Ex
 Only UM Form's single select dropdowns are supported.
 
 ## CSV files and format
-1. Three columns one column for each of the three levels https://imgur.com/a/gqXH9Fo
+1. Two or Three columns one column for each of the two or three levels https://imgur.com/a/gqXH9Fo
 2. CSV file field separators selectable.
 3. Create and upload the CSV files to this folder:  .../wp-content/uploads/ultimatemember/threewaydropdowns/
 4. All Dropdown selections use the same uploads folder.
