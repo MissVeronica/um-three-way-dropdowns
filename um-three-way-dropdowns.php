@@ -2,7 +2,7 @@
 /**
  * Plugin Name:     Ultimate Member - Three Way Dropdown options
  * Description:     Extension to Ultimate Member for defining two or three way dropdown options in a spreadsheet saved as a CSV file.
- * Version:         3.0.0
+ * Version:         3.1.0
  * Requires PHP:    7.4
  * Author:          Miss Veronica
  * License:         GPL v2 or later
@@ -380,9 +380,9 @@ Class UM_Three_Way_Dropdowns {
             'type'          => 'checkbox',
             'label'         => __( 'Enable this Three Way Dropdowns section', 'ultimate-member' ) . 
                                     '<br>' . __( 'UM Forms Dropdown Callbacks:', 'ultimate-member' ) .
-                                    '<br>' . sprintf( __( 'Top level: "%s"', 'ultimate-member' ), 'get_custom_top_list' . $section ) .
-                                    '<br>' . sprintf( __( 'Middle level: "%s"', 'ultimate-member' ), 'get_custom_mid_list' . $section ) .
-                                    '<br>' . sprintf( __( 'Bottom level: "%s"', 'ultimate-member' ), 'get_custom_btm_list' . $section ),
+                                    '<br>' . sprintf( __( 'Top level: "%s"', 'ultimate-member' ), 'get_custom_top_list_dropdown' . substr( $section, -2 )) .
+                                    '<br>' . sprintf( __( 'Middle level: "%s"', 'ultimate-member' ), 'get_custom_mid_list_dropdown' . substr( $section, -2 )) .
+                                    '<br>' . sprintf( __( 'Bottom level: "%s"', 'ultimate-member' ), 'get_custom_btm_list_dropdown' . substr( $section, -2 )),
             'tooltip'       => __( 'Click to activate this dropdown.', 'ultimate-member' ),
         );
 
@@ -444,7 +444,7 @@ Class UM_Three_Way_Dropdowns {
                                         19 => 'S',
                                         20 => 'T',
                                     ),
-            'label'         => __( 'CSV File three spreadsheet columns two or three', 'ultimate-member' ),
+            'label'         => __( 'CSV File spreadsheet select two or three columns', 'ultimate-member' ),
             'tooltip'       => __( 'Select the two or three columns in the spreadsheet where you have Top, Middle if two and Bottom if three options.', 'ultimate-member' ),
             'conditional'   => array( 'um_three_way_dropdowns_active' . $section, '=', 1 ),
         );
@@ -604,3 +604,4 @@ UM()->classes['um_three_way_dropdowns'] = new UM_Three_Way_Dropdowns();
 
         return setup_custom_mid_btm_list_dropdown( $parent, '_dropdown_d', 'mid', 'btm' );
     }
+
