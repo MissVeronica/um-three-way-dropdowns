@@ -19,6 +19,7 @@ Only UM Form's single select dropdowns are supported.
 5. CSV File header line remove - Click if you have a header line in the first line of the CSV files.
 6. CSV File field separator - Select the separator character.
 7. https://imgur.com/a/2PmljWx
+8. https://imgur.com/a/JAWrN1j
 
 ## Migration from Version 2 to 3
 1. The first Dropdown section is reusing settings and callbacks from version 2 when being enabled.
