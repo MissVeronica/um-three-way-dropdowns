@@ -7,7 +7,7 @@ Only UM Form's single select dropdowns are supported.
 1. Two or Three columns one column for each of the two or three levels https://imgur.com/a/gqXH9Fo
 2. Column sort order Top, Middle, Bottom
 3. CSV file field separators selectable.
-4. Create and upload the CSV files to this folder:  .../wp-content/uploads/ultimatemember/threewaydropdowns/
+4. Create and upload the CSV files to this folder:  <code>.../wp-content/uploads/ultimatemember/threewaydropdowns/</code>
 5. All Dropdown selections use the same uploads folder.
 6. Single or double quotes around text fields are removed by the plugin.
 
