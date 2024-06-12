@@ -18,7 +18,7 @@ Only UM Form's single select dropdowns are supported.
 4. Enter example.txt.csv in settings 3. CSV File Names
 5. Select columns A and B in settings 4. CSV File spreadsheet select two or three columns
 6. No selections in settings 5. and 6.
-7. Enter a ; in setting 7. CSV File field separator
+7. Select "Semicolon" in setting 7. CSV File field separator
 
 ## UM Settings in main tab Dropdowns
 1. Select the Top dropdown's "Label - meta_key" - The Middle dropdown will rely on the Top parent meta_key for Options selection
