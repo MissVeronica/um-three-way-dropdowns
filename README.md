@@ -41,6 +41,9 @@ Only UM Form's single select dropdowns are supported.
 1. Callbacks are displayed at each dropdown's enable checkbox
 2. Examples with: State, Section, Group https://imgur.com/a/maYaqwd
 
+## Caching of options
+1. Dropdown options cache is updated from current uploaded .txt or .csv files in the folder each time you click at one of the sublinks in UM Settings -> Dropdowns
+
 ## Test file
 1. Use the file "dropdowns.csv" or "dropdowns-a.csv" in the plugin directory: um-three-way-dropdowns-main 
 
