@@ -1,6 +1,6 @@
 # Ultimate Member - Two and Three Way Dropdown options
 Extension to Ultimate Member for defining two or three way dropdown options in spreadsheets saved as CSV files.
-Create the CSV files with an app which can export a file with CSV format like Excel or LibreOffice etc.
+Create the CSV files with an app which can export a file with CSV format like Excel or LibreOffice etc. From version 3.2.0 there is an option to use a text file for defining dropdown options.
 Only UM Form's single select dropdowns are supported.
 
 ## CSV files and format
@@ -11,15 +11,26 @@ Only UM Form's single select dropdowns are supported.
 5. All Dropdown selections use the same uploads folder.
 6. Single or double quotes around text fields are removed by the plugin.
 
+## Optional text file format
+1. See example here https://github.com/MissVeronica/um-three-way-dropdowns/issues/2
+2. Upload the file as example.txt to the <code>.../wp-content/uploads/ultimatemember/threewaydropdowns/</code> folder
+3. The UM Settings in main tab Dropdowns entry will convert the example.txt file to example.txt.csv
+4. Enter example.txt.csv in settings 3. CSV File Names
+5. Select columns A and B in settings 4. CSV File spreadsheet select two or three columns
+6. No selections in settings 5. and 6.
+7. Enter a ; in setting 7. CSV File field separator
+
 ## UM Settings in main tab Dropdowns
 1. Select the Top dropdown's "Label - meta_key" - The Middle dropdown will rely on the Top parent meta_key for Options selection
 2. Select the Middle dropdown's "Label - meta_key" - The Bottom dropdown will rely on the Middle parent meta_key for Options selection
 3. CSV File Names (one name per line) - Enter the CSV files names one per line.
 4. CSV File spreadsheet select two or three columns - Select the two or three columns in the spreadsheet where you have Top, Middle and Bottom options.
-5. CSV File header line remove - Click if you have a header line in the first line of the CSV files.
-6. CSV File field separator - Select the separator character.
-7. https://imgur.com/a/2PmljWx
-8. https://imgur.com/a/JAWrN1j
+5. CSV File spreadsheet select two or three columns for option texts - Select the two or three columns in the spreadsheet where you have Top, Middle if two and include also Bottom if three options text message.
+6. CSV File header line remove - Click if you have a header line in the first line of the CSV files.
+7. CSV File field separator - Select the separator character.
+8. WordPress autoload of options - Click to improve response times of options load.
+9. https://imgur.com/a/2PmljWx
+10. https://imgur.com/a/JAWrN1j
 
 ## Migration from Version 2 to 3
 1. The first Dropdown section is reusing settings and callbacks from version 2 when being enabled.
@@ -44,6 +55,7 @@ Only UM Form's single select dropdowns are supported.
 3. Version 2.2.0 Header line removal, line terminator update
 4. Version 2.3.0 CSV Field Separator selection.
 5. Version 3.1.0 Support for 5 CSV dropdowns with either 2 or 3 levels. Updated the documentation in the plugin.
+6. Version 3.2.9 Code improvements. Text file input in addition to .CSV file.
 
 ## Installation
 1. Install by downloading the plugin ZIP file and install as a new Plugin, which you upload in WordPress -> Plugins -> Add New -> Upload Plugin.
