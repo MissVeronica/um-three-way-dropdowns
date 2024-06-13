@@ -37,7 +37,7 @@ Only UM Form's single select dropdowns are supported.
 1. The first Dropdown section is reusing settings and callbacks from version 2 when being enabled.
 2. New settings for top and middle level meta-keys must be selected.
 
-## UM Form Settings
+## UM Form Builder Settings
 1. Callbacks are displayed at each dropdown's enable checkbox
 2. Examples with: State, Section, Group https://imgur.com/a/maYaqwd
 
