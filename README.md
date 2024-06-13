@@ -7,13 +7,13 @@ Only UM Form's single select dropdowns are supported.
 1. Two or Three columns one column for each of the two or three levels https://imgur.com/a/gqXH9Fo
 2. Column sort order Top, Middle, Bottom
 3. CSV file field separators selectable.
-4. Create and upload the CSV files to this folder:  <code>.../wp-content/uploads/ultimatemember/threewaydropdowns/</code>
+4. Create and upload the CSV files with your FTP client to this folder:  <code>.../wp-content/uploads/ultimatemember/threewaydropdowns/</code>
 5. All Dropdown selections use the same uploads folder.
 6. Single or double quotes around text fields are removed by the plugin.
 
 ## Optional text file format
 1. See example here https://github.com/MissVeronica/um-three-way-dropdowns/issues/2
-2. Upload the file as example.txt to the <code>.../wp-content/uploads/ultimatemember/threewaydropdowns/</code> folder
+2. Create and upload the file as example.txt with your FTP client to the <code>.../wp-content/uploads/ultimatemember/threewaydropdowns/</code> folder
 3. The UM Settings in main tab Dropdowns entry will convert the example.txt file to example.txt.csv
 4. Enter example.txt.csv in settings 3. CSV File Names
 5. Select columns A and B in settings 4. CSV File spreadsheet select two or three columns
