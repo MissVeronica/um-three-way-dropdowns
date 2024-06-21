@@ -2,7 +2,7 @@
 /**
  * Plugin Name:     Ultimate Member - Three Way Dropdown options
  * Description:     Extension to Ultimate Member for defining two or three way dropdown options in a spreadsheet saved as a CSV file.
- * Version:         3.2.0
+ * Version:         3.2.1
  * Requires PHP:    7.4
  * Author:          Miss Veronica
  * License:         GPL v2 or later
@@ -672,8 +672,6 @@ UM()->classes['um_three_way_dropdowns'] = new UM_Three_Way_Dropdowns();
 
     function setup_custom_top_list_dropdown( $section ) {
 
-        //re_initialize_dropdown_functionality();
-
         if ( UM()->options()->get( 'um_three_way_dropdowns_active' . $section ) != 1 ) {
             return array( __( 'Plugin not active', 'ultimate-member' ));
         }
@@ -693,18 +691,57 @@ UM()->classes['um_three_way_dropdowns'] = new UM_Three_Way_Dropdowns();
             return array( __( 'Plugin not active', 'ultimate-member' ));
         }
 
-        $parent_option = isset( $_POST['parent_option'] ) ? sanitize_text_field( $_POST['parent_option'] ) : false;
-        if ( empty( $parent )) {
+        $post = false;
+        if ( is_array( $_POST ) && ! empty( $_POST )) {
+            $post = array_map( 'sanitize_text_field', $_POST );
+        }
+
+        if ( isset( $post['members_directory'] ) && $post['members_directory'] == 'yes' ) {
+
+            $parent_option = false;
+
+            if ( isset(  $post['action'] ) && $post['action'] == 'um_select_options' ) {
+
+                if ( isset( $post['parent_option'] ) && is_array( $post['parent_option'] )) {
+
+                    $parent_option = html_entity_decode( $post['parent_option'][0] );
+
+                    if ( isset( $post['parent_option_name'] )) {
+                        $parent = $post['parent_option_name'];
+                    }
+                }
+            }
+
+        } else {
+
+            $parent_option = isset( $post['parent_option'] ) ? html_entity_decode( $post['parent_option'] ) : false;
+        }
+
+        if ( empty( $parent ) || is_array( $parent )) {
             $parent = sanitize_text_field( trim( UM()->options()->get( "um_three_way_dropdowns_{$level_1}_meta{$section}" )));
         }
 
-        $dropdown_options = get_option( "three_way_dropdowns_{$level_2}_{$parent}" );
+        $temp_options = get_option( "three_way_dropdowns_{$level_2}_{$parent}" );
+
+        $dropdown_options = array();
+        foreach( $temp_options as $key => $temp_option ) {
+            $dropdown_options[html_entity_decode( $key )] = $temp_option;
+        }
 
         if ( empty( $parent_option )) {
 
+            $get_all_options = false;
             $all_options = array();
-            if ( isset( $_POST['action'] ) && sanitize_text_field( $_POST['action'] ) == 'um_populate_dropdown_options' ) {
 
+            if ( isset( $post['action'] ) && in_array( $post['action'], array( 'um_populate_dropdown_options', 'um_select_options' ) )) {
+                $get_all_options = true;
+            }
+
+            if ( isset( $post[$parent] ) || empty( $post )) {
+                $get_all_options = true;
+            }
+
+            if ( $get_all_options ) {
                 foreach ( $dropdown_options as $options ) {
                     $all_options = array_merge( $options, $all_options );
                 }
@@ -716,10 +753,14 @@ UM()->classes['um_three_way_dropdowns'] = new UM_Three_Way_Dropdowns();
         $dropdown_option = isset( $dropdown_options[$parent_option] ) ? $dropdown_options[$parent_option] : false;
 
         if ( empty( $dropdown_option )) {
-            return array( __( 'Options empty for mid or bottom level', 'ultimate-member' ));
+
+            return array( __( 'Option error', 'ultimate-member' ));
         }
+
         return $dropdown_option;
     }
+
+// CALLBACKS TOP
 
     function get_custom_top_list_dropdown() {
 
@@ -746,6 +787,8 @@ UM()->classes['um_three_way_dropdowns'] = new UM_Three_Way_Dropdowns();
         return setup_custom_top_list_dropdown( '_dropdown_d' );
     }
 
+// CALLBACKS MID
+
     function get_custom_mid_list_dropdown( $parent = false ) {
 
         return setup_custom_mid_btm_list_dropdown( $parent, '', 'top', 'mid' );
@@ -770,6 +813,8 @@ UM()->classes['um_three_way_dropdowns'] = new UM_Three_Way_Dropdowns();
 
         return setup_custom_mid_btm_list_dropdown( $parent, '_dropdown_d', 'top', 'mid' );
     }
+
+// CALLBACKS BTM
 
     function get_custom_btm_list_dropdown( $parent = false ) {
 
