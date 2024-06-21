@@ -60,6 +60,7 @@ Only UM Form's single select dropdowns are supported.
 4. Version 2.3.0 CSV Field Separator selection.
 5. Version 3.1.0 Support for 5 CSV dropdowns with either 2 or 3 levels. Updated the documentation in the plugin.
 6. Version 3.2.9 Code improvements. Text file input in addition to .CSV file.
+7. Version 3.2.1 Code improvements for Members Directory but still no display of Users in the Directory
 
 ## Installation
 1. Install by downloading the plugin ZIP file and install as a new Plugin, which you upload in WordPress -> Plugins -> Add New -> Upload Plugin.
