@@ -1,6 +1,6 @@
 # Ultimate Member - Two and Three Way Dropdown options
-Extension to Ultimate Member for defining two or three way dropdown options in spreadsheets saved as CSV files.
-Create the CSV files with an app which can export a file with CSV format like Excel or LibreOffice etc. From version 3.2.0 there is an option to use a text file for defining dropdown options.
+Extension to Ultimate Member for defining two or three way dropdown options either in a spreadsheet saved as a CSV file or as a formatted TXT file. 
+Create the CSV files with an app which can export a file with CSV format like Excel or LibreOffice etc. From version 3.2.0 there is an option to use a text TXT file for defining dropdown options.
 Only UM Form's single select dropdowns are supported.
 
 ## CSV files and format
@@ -9,11 +9,11 @@ Only UM Form's single select dropdowns are supported.
 3. CSV file field separators selectable.
 4. Create and upload the CSV files with your FTP client to this folder:  <code>.../wp-content/uploads/ultimatemember/threewaydropdowns/</code>
 5. All Dropdown selections use the same uploads folder.
-6. Single or double quotes around text fields are removed by the plugin.
+6. Single or double quotes around CSV text fields are removed by the plugin.
 
-## Optional text file format
+## Optional text TXT file format
 1. See example here https://github.com/MissVeronica/um-three-way-dropdowns/issues/2
-2. Create and upload the file as example.txt with your FTP client to the <code>.../wp-content/uploads/ultimatemember/threewaydropdowns/</code> folder
+2. Create and upload the TXT file as example.txt with your FTP client to the <code>.../wp-content/uploads/ultimatemember/threewaydropdowns/</code> folder
 3. The UM Settings in main tab Dropdowns entry will convert the example.txt file to example.txt.csv
 4. Enter example.txt.csv in settings 3. CSV File Names
 5. Select columns A and B in settings 4. CSV File spreadsheet select two or three columns
@@ -59,7 +59,7 @@ Only UM Form's single select dropdowns are supported.
 3. Version 2.2.0 Header line removal, line terminator update
 4. Version 2.3.0 CSV Field Separator selection.
 5. Version 3.1.0 Support for 5 CSV dropdowns with either 2 or 3 levels. Updated the documentation in the plugin.
-6. Version 3.2.9 Code improvements. Text file input in addition to .CSV file.
+6. Version 3.2.0 Code improvements. Text file input in addition to .CSV file.
 7. Version 3.2.1 Code improvements for Members Directory,
 
 ## Installation
