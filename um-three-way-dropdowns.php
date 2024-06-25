@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name:     Ultimate Member - Three Way Dropdown options
+ * Plugin Name:     Ultimate Member - Two and Three Way Dropdown options
  * Description:     Extension to Ultimate Member for defining two or three way dropdown options in a spreadsheet saved as a CSV file.
- * Version:         3.2.1
+ * Version:         3.2.2
  * Requires PHP:    7.4
  * Author:          Miss Veronica
  * License:         GPL v2 or later
@@ -13,7 +13,11 @@
  * UM version:      2.8.6
  */
 
-if ( ! defined( 'ABSPATH' ) ) exit; 
+//.um-clear-filters a {
+//	display: none !important;
+//}
+
+if ( ! defined( 'ABSPATH' ) ) exit;
 if ( ! class_exists( 'UM' ) ) return;
 
 
@@ -39,10 +43,23 @@ Class UM_Three_Way_Dropdowns {
     public $response = array();
 
     public $levels = 0;
-    public $tab_name = 'three_way_dropdowns';
-    public $upload_csv_dir = WP_CONTENT_DIR . '/uploads/ultimatemember/threewaydropdowns/';
 
-    public $separators = array( 
+    public $tab_name         = 'three_way_dropdowns';
+    public $upload_csv_dir   = WP_CONTENT_DIR . '/uploads/ultimatemember/threewaydropdowns/';
+    public $callback_section = '';
+
+    public $valid_sections  = array(
+                                      '',
+                                      '_dropdown_a',
+                                      '_dropdown_b',
+                                      '_dropdown_c',
+                                      '_dropdown_d',
+                                    );
+
+    public $valid_parent_levels  = array( 'top', 'mid' );
+    public $valid_current_levels = array( 'mid', 'btm' );
+
+    public $separators      = array( 
                                 'colon'     => ':',
                                 'semicolon' => ';',
                                 'comma'     => ',',
@@ -88,11 +105,11 @@ Class UM_Three_Way_Dropdowns {
 
         if ( is_admin() && ! defined( 'DOING_AJAX' )) {
 
-            add_filter( 'um_settings_custom_subtabs',                       array( $this, 'um_settings_custom_tabs_three_way_dropdowns' ), 10, 1 );
-            add_filter( 'um_settings_structure',                            array( $this, 'um_settings_structure_main_three_way_dropdowns' ), 10, 1 );
-            add_filter( 'um_settings_section_three_way_dropdowns__content', array( $this, 'contents_three_way_dropdowns_tab' ), 10, 2 );
-            add_filter( 'um_settings_custom_subtabs',                       array( $this, 'um_settings_custom_subtabs_three_way_dropdowns' ), 10, 2 );
-
+            add_filter( 'um_settings_custom_subtabs',                              array( $this, 'um_settings_custom_tabs_three_way_dropdowns' ), 10, 1 );
+            add_filter( 'um_settings_structure',                                   array( $this, 'um_settings_structure_main_three_way_dropdowns' ), 10, 1 );
+            add_filter( 'um_settings_section_three_way_dropdowns__custom_content', array( $this, 'contents_three_way_dropdowns_tab' ), 10, 3 );
+            add_filter( 'um_settings_custom_subtabs',                              array( $this, 'um_settings_custom_subtabs_three_way_dropdowns' ), 10, 2 );
+            add_filter( 'um_settings_default_form_wrapper',                        array( $this, 'um_settings_default_form_wrapper_three_way_dropdowns' ), 10, 3 );
         }
     }
 
@@ -178,15 +195,34 @@ Class UM_Three_Way_Dropdowns {
         return $array;
     }
 
-    public function contents_three_way_dropdowns_tab( $html, $section_fields ) {
+    public function contents_three_way_dropdowns_tab( $html, $current_tab, $current_subtab ) {
 
-        echo '<div class="clear"></div><h4>Two and Three Way Dropdown options version 3.2.2</h4>
-              <div><p>New in this version</p>
-              <p>1. A second multi-select setting for defining the texts to display for the User in the Forms dropdown.<br/>
-              If no selections is made the same columns as options is being used for the Form display text.</p>
-              2. WordPress autoload of options. Whether to load the options when WordPress starts up. Default is "No"</p>
-              <p>3. Database read times for each option</p>
-              <p>4. Backend code improvements</p></div>';
+        if ( $current_tab == 'three_way_dropdowns' && $current_subtab == '' ) {
+
+            $plugin_data = get_plugin_data( __FILE__ );
+
+            $html = '
+                    <div class="clear"></div>
+                    <h2 class="title">Intro for the Two and Three Way Dropdown options 
+                    <a href="https://github.com/MissVeronica/um-three-way-dropdowns" target="_blank" title="GitHub plugin documentation and download">plugin</a> 
+                    version ' . $plugin_data['Version'] . '</h2>
+                    <div><p>New settings in this plugin version</p>
+                    <p>1. Sort top dropdown options - Click to sort ascending the top dropdown options displayed.</p>
+                    <p>2. Sort mid/btm dropdown options - Click to sort ascending all mid and bottom dropdown options displayed.</p>
+                    <p>3. Log the plugin\'s callback requests/replies - Click to log the plugin\'s callback requests/replies to the file .../wp-content/debug.log</p>
+                    </div>';
+        }
+
+        return $html;
+    }
+
+    public function um_settings_default_form_wrapper_three_way_dropdowns( $form_wrapper, $current_tab, $current_subtab ) {
+
+        if ( $current_tab == 'three_way_dropdowns' && $current_subtab == '' ) {
+            $form_wrapper = false;
+        }
+
+        return $form_wrapper;
     }
 
     public function um_settings_structure_main_three_way_dropdowns( $settings_structure ) {
@@ -206,7 +242,7 @@ Class UM_Three_Way_Dropdowns {
                         'title'  => __( 'Dropdowns', 'ultimate-member' ),
                         'sections' => array(
                             '' => array(
-                                    'title'  => __( 'Intro', 'ultimate-member' ),
+                                    'title'  => __( 'Plugin Intro', 'ultimate-member' ),
                                     ),
                             'dropdown' => array(
                                     'title'  => __( 'Dropdown', 'ultimate-member' ),
@@ -661,20 +697,81 @@ Class UM_Three_Way_Dropdowns {
             'conditional'    => array( 'um_three_way_dropdowns_active' . $section, '=', 1 ),
         );
 
+        $settings_structure[] = array(
+            'id'             => 'um_three_way_dropdowns_sort_dropdowns_top' . $section,
+            'type'           => 'checkbox',
+            'label'          => __( 'Sort top dropdown options', 'ultimate-member' ),
+            'checkbox_label' => __( 'Click to sort ascending the top dropdown options displayed.', 'ultimate-member' ),
+            'conditional'    => array( 'um_three_way_dropdowns_active' . $section, '=', 1 ),
+        );
+
+        $settings_structure[] = array(
+            'id'             => 'um_three_way_dropdowns_sort_dropdowns' . $section,
+            'type'           => 'checkbox',
+            'label'          => __( 'Sort mid/btm dropdown options', 'ultimate-member' ),
+            'checkbox_label' => __( 'Click to sort ascending all mid and bottom dropdown options displayed.', 'ultimate-member' ),
+            'conditional'    => array( 'um_three_way_dropdowns_active' . $section, '=', 1 ),
+        );
+
+        $settings_structure[] = array(
+            'id'             => 'um_three_way_dropdowns_log' . $section,
+            'type'           => 'checkbox',
+            'label'          => __( 'Log the plugin\'s callback requests/replies', 'ultimate-member' ),
+            'checkbox_label' => __( 'Click to log the plugin\'s callback requests/replies to the file .../wp-content/debug.log', 'ultimate-member' ),
+            'conditional'    => array( 'um_three_way_dropdowns_active' . $section, '=', 1 ),
+        );
+
         return $settings_structure;
     }
-}
 
-UM()->classes['um_three_way_dropdowns'] = new UM_Three_Way_Dropdowns();
+    public function custom_dropdown_log( $section, $level, $text = '', $values = false ) {
+
+        if ( UM()->options()->get( 'um_three_way_dropdowns_log' . $section ) == 1 ) {
+
+            $trace = date_i18n( 'Y-m-d H:i:s ', current_time( 'timestamp' )) . 'Three Way Dropdowns option name: three_way_dropdowns_' . $level . $section . ' ' . $text . ' ';
+
+            if ( ! empty( $values )) {
+
+                if ( is_array( $values )) {
+
+                    if ( isset( $values['password'] )) {
+                        $values['password'] = '******';
+                    }
+                    if ( isset( $values['user_password'] )) {
+                        $values['user_password'] = '******';
+                    }
+                    $trace .= print_r( $values, true );
+
+                } else {
+                    $trace .= $values;
+                }
+
+            } else {
+
+                if ( $values !== false ) {
+                    $trace .= '"empty"';
+                }
+            }
+
+            file_put_contents( WP_CONTENT_DIR . '/debug.log', $trace . chr(13), FILE_APPEND );
+        }
+    }
 
 
 
+// CALLBACKS COMMON FUNCTIONS
 
-    function setup_custom_top_list_dropdown( $section ) {
+    public function setup_custom_top_list_dropdown( $section ) {
+
+        if ( ! in_array( $section, $this->valid_sections )) {
+            return;
+        }
 
         if ( UM()->options()->get( 'um_three_way_dropdowns_active' . $section ) != 1 ) {
             return array( __( 'Plugin not active', 'ultimate-member' ));
         }
+
+        $this->custom_dropdown_log( $section, 'top', ' POST', $_POST );
 
         $dropdown_options = get_option( 'three_way_dropdowns_top' . $section );
 
@@ -682,53 +779,89 @@ UM()->classes['um_three_way_dropdowns'] = new UM_Three_Way_Dropdowns();
             return array( __( 'Options empty', 'ultimate-member' ));
         }
 
+        if ( UM()->options()->get( "um_three_way_dropdowns_sort_dropdowns_top{$section}" ) == 1 && is_array( $dropdown_options )) {
+            asort( $dropdown_options );
+        }
+
+        $this->custom_dropdown_log( $section, 'top', 'Return', $dropdown_options );
+
         return $dropdown_options;
     }
 
-    function setup_custom_mid_btm_list_dropdown( $parent, $section, $level_1, $level_2 ) {
+    public function setup_custom_mid_btm_list_dropdown( $parent, $section, $parent_level, $current_level ) {
+
+        if ( ! in_array( $section, $this->valid_sections )) {
+            return;
+        }
 
         if ( UM()->options()->get( 'um_three_way_dropdowns_active' . $section ) != 1 ) {
             return array( __( 'Plugin not active', 'ultimate-member' ));
         }
 
+        if ( ! in_array( $parent_level,  $this->valid_parent_levels ) ||
+             ! in_array( $current_level, $this->valid_current_levels )) {
+
+            $this->custom_dropdown_log( $section, 'INVALID', );
+            return;
+        }
+
+        $this->custom_dropdown_log( $section, $current_level, 'POST', $_POST );
+        $this->custom_dropdown_log( $section, $current_level, 'Parent', $parent );
+
+        if ( isset( $_POST['parent_option'] ) && empty( $_POST['parent_option'] )) {
+
+            $this->custom_dropdown_log( $section, $current_level, 'Return Parent option', array() );
+            return;
+        }
+
         $post = false;
-        if ( is_array( $_POST ) && ! empty( $_POST )) {
+        $parent_options = array();
+
+        if ( is_array( $_POST )) {
+
             $post = array_map( 'sanitize_text_field', $_POST );
+
+            if ( isset( $_POST['parent_option'] )) {
+
+                if ( is_array( $_POST['parent_option'] )) {
+
+                    $post['parent_option'] = array_map( 'sanitize_text_field', $_POST['parent_option'] );
+                    foreach( $post['parent_option'] as $parent_option ) {
+                        $parent_options[] = html_entity_decode( $parent_option );
+                    }
+
+                } else {
+                    $parent_options[] = html_entity_decode( $post['parent_option'] );
+                }
+            }
         }
 
         if ( isset( $post['members_directory'] ) && $post['members_directory'] == 'yes' ) {
 
-            $parent_option = false;
-
-            if ( isset(  $post['action'] ) && $post['action'] == 'um_select_options' ) {
-
-                if ( isset( $post['parent_option'] ) && is_array( $post['parent_option'] )) {
-
-                    $parent_option = html_entity_decode( $post['parent_option'][0] );
-
-                    if ( isset( $post['parent_option_name'] )) {
-                        $parent = $post['parent_option_name'];
-                    }
-                }
+            if ( isset( $post['parent_option_name'] ) && ! empty( $post['parent_option_name'] ) ) {
+                $parent = $post['parent_option_name'];
             }
-
-        } else {
-
-            $parent_option = isset( $post['parent_option'] ) ? html_entity_decode( $post['parent_option'] ) : false;
         }
 
         if ( empty( $parent ) || is_array( $parent )) {
-            $parent = sanitize_text_field( trim( UM()->options()->get( "um_three_way_dropdowns_{$level_1}_meta{$section}" )));
+            $parent = sanitize_text_field( trim( UM()->options()->get( "um_three_way_dropdowns_{$parent_level}_meta{$section}" )));
         }
-
-        $temp_options = get_option( "three_way_dropdowns_{$level_2}_{$parent}" );
 
         $dropdown_options = array();
-        foreach( $temp_options as $key => $temp_option ) {
-            $dropdown_options[html_entity_decode( $key )] = $temp_option;
+
+        if ( ! empty( $parent )) {
+            $temp_options = get_option( "three_way_dropdowns_{$current_level}_{$parent}" );
+
+            if ( ! empty( $temp_options )) {
+                foreach( $temp_options as $temp_key => $temp_option ) {
+
+                    $key = html_entity_decode( $temp_key );
+                    $dropdown_options[$key] = $temp_option;
+                }
+            }
         }
 
-        if ( empty( $parent_option )) {
+        if ( empty( $parent_options )) {
 
             $get_all_options = false;
             $all_options = array();
@@ -747,97 +880,144 @@ UM()->classes['um_three_way_dropdowns'] = new UM_Three_Way_Dropdowns();
                 }
             }
 
+            $this->custom_dropdown_log( $section, $current_level, 'Return all options count=', count( $all_options ) );
+
             return $all_options;
         }
 
-        $dropdown_option = isset( $dropdown_options[$parent_option] ) ? $dropdown_options[$parent_option] : false;
+        if ( is_array( $parent_options ) && count( $parent_options ) > 1 ) {
+
+            $dropdown_option = array();
+
+            foreach( $parent_options as $parent_option ) {
+
+                $dropdowns = isset( $dropdown_options[$parent_option] ) ? $dropdown_options[$parent_option] : false;
+
+                if ( ! empty( $dropdowns )) {
+                    if ( is_array( $dropdowns )) {
+
+                        if ( empty( $dropdown_option )) {
+                            $dropdown_option = $dropdowns;
+
+                        } else {
+                            $dropdown_option = array_merge( $dropdown_option, $dropdowns );
+                        }
+
+                    } else {
+
+                        $dropdown_option = array_merge( $dropdown_option, array( $dropdowns => $dropdowns ));
+                    }
+                }
+            }
+
+        } else {
+
+            if ( isset( $parent_options[0] ) && ! empty( $parent_options[0] )) {
+                $dropdown_option = isset( $dropdown_options[$parent_options[0]] ) ? $dropdown_options[$parent_options[0]] : false;
+            }
+        }
 
         if ( empty( $dropdown_option )) {
 
-            return array( __( 'Option error', 'ultimate-member' ));
+            $this->custom_dropdown_log( $section, $current_level, 'Return options ', array() );
+
+            return array( __( 'Option empty for mid or bottom level', 'ultimate-member' ));
         }
+
+        if ( UM()->options()->get( "um_three_way_dropdowns_sort_dropdowns{$section}" ) == 1 && is_array( $dropdown_option )) {
+            asort( $dropdown_option );
+        }
+
+        $this->custom_dropdown_log( $section, $current_level, 'Return', $dropdown_option );
 
         return $dropdown_option;
     }
+
+}
+
+UM()->classes['um_three_way_dropdowns'] = new UM_Three_Way_Dropdowns();
+
 
 // CALLBACKS TOP
 
     function get_custom_top_list_dropdown() {
 
-        return setup_custom_top_list_dropdown( '' );
+        return UM()->classes['um_three_way_dropdowns']->setup_custom_top_list_dropdown( '' );
     }
 
     function get_custom_top_list_dropdown_a() {
 
-        return setup_custom_top_list_dropdown( '_dropdown_a' );
+        return UM()->classes['um_three_way_dropdowns']->setup_custom_top_list_dropdown( '_dropdown_a' );
     }
 
     function get_custom_top_list_dropdown_b() {
 
-        return setup_custom_top_list_dropdown( '_dropdown_b' );
+        return UM()->classes['um_three_way_dropdowns']->setup_custom_top_list_dropdown( '_dropdown_b' );
     }
 
     function get_custom_top_list_dropdown_c() {
 
-        return setup_custom_top_list_dropdown( '_dropdown_c' );
+        return UM()->classes['um_three_way_dropdowns']->setup_custom_top_list_dropdown( '_dropdown_c' );
     }
 
     function get_custom_top_list_dropdown_d() {
 
-        return setup_custom_top_list_dropdown( '_dropdown_d' );
+        return UM()->classes['um_three_way_dropdowns']->setup_custom_top_list_dropdown( '_dropdown_d' );
     }
 
 // CALLBACKS MID
 
     function get_custom_mid_list_dropdown( $parent = false ) {
 
-        return setup_custom_mid_btm_list_dropdown( $parent, '', 'top', 'mid' );
+        return UM()->classes['um_three_way_dropdowns']->setup_custom_mid_btm_list_dropdown( $parent, '', 'top', 'mid' );
     }
 
     function get_custom_mid_list_dropdown_a( $parent = false ) {
 
-        return setup_custom_mid_btm_list_dropdown( $parent, '_dropdown_a', 'top', 'mid' );
+        return UM()->classes['um_three_way_dropdowns']->setup_custom_mid_btm_list_dropdown( $parent, '_dropdown_a', 'top', 'mid' );
     }
 
     function get_custom_mid_list_dropdown_b( $parent = false ) {
 
-        return setup_custom_mid_btm_list_dropdown( $parent, '_dropdown_b', 'top', 'mid' );
+        return UM()->classes['um_three_way_dropdowns']->setup_custom_mid_btm_list_dropdown( $parent, '_dropdown_b', 'top', 'mid' );
     }
 
     function get_custom_mid_list_dropdown_c( $parent = false ) {
 
-        return setup_custom_mid_btm_list_dropdown( $parent, '_dropdown_c', 'top', 'mid' );
+        return UM()->classes['um_three_way_dropdowns']->setup_custom_mid_btm_list_dropdown( $parent, '_dropdown_c', 'top', 'mid' );
     }
 
     function get_custom_mid_list_dropdown_d( $parent = false ) {
 
-        return setup_custom_mid_btm_list_dropdown( $parent, '_dropdown_d', 'top', 'mid' );
+        return UM()->classes['um_three_way_dropdowns']->setup_custom_mid_btm_list_dropdown( $parent, '_dropdown_d', 'top', 'mid' );
     }
 
 // CALLBACKS BTM
 
     function get_custom_btm_list_dropdown( $parent = false ) {
 
-        return setup_custom_mid_btm_list_dropdown( $parent, '', 'mid', 'btm' );
+        return UM()->classes['um_three_way_dropdowns']->setup_custom_mid_btm_list_dropdown( $parent, '', 'mid', 'btm' );
     }
 
     function get_custom_btm_list_dropdown_a( $parent = false ) {
 
-        return setup_custom_mid_btm_list_dropdown( $parent, '_dropdown_a', 'mid', 'btm' );
+        return UM()->classes['um_three_way_dropdowns']->setup_custom_mid_btm_list_dropdown( $parent, '_dropdown_a', 'mid', 'btm' );
     }
 
     function get_custom_btm_list_dropdown_b( $parent = false ) {
 
-        return setup_custom_mid_btm_list_dropdown( $parent, '_dropdown_b', 'mid', 'btm' );
+        return UM()->classes['um_three_way_dropdowns']->setup_custom_mid_btm_list_dropdown( $parent, '_dropdown_b', 'mid', 'btm' );
     }
 
     function get_custom_btm_list_dropdown_c( $parent = false ) {
 
-        return setup_custom_mid_btm_list_dropdown( $parent, '_dropdown_c', 'mid', 'btm' );
+        return UM()->classes['um_three_way_dropdowns']->setup_custom_mid_btm_list_dropdown( $parent, '_dropdown_c', 'mid', 'btm' );
     }
 
     function get_custom_btm_list_dropdown_d( $parent = false ) {
 
-        return setup_custom_mid_btm_list_dropdown( $parent, '_dropdown_d', 'mid', 'btm' );
+        return UM()->classes['um_three_way_dropdowns']->setup_custom_mid_btm_list_dropdown( $parent, '_dropdown_d', 'mid', 'btm' );
     }
+
+
 
