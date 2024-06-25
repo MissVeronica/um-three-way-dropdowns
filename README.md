@@ -30,8 +30,11 @@ Only UM Form's single select dropdowns are supported.
 6. CSV File header line remove - Click if you have a header line in the first line of the CSV files.
 7. CSV File field separator - Select the separator character.
 8. WordPress autoload of options - Click to improve response times of options load.
-9. https://imgur.com/a/2PmljWx
-10. https://imgur.com/a/JAWrN1j
+9. Sort top dropdown options - Click to sort ascending the top dropdown options displayed.
+10. Sort mid/btm dropdown options - Click to sort ascending all mid and bottom dropdown options displayed.
+11. Log the plugin's callback requests/replies - Click to log the plugin's callback requests/replies to the file .../wp-content/debug.log
+12. https://imgur.com/a/2PmljWx
+13. https://imgur.com/a/JAWrN1j
 
 ## Migration from Version 2 to 3
 1. The first Dropdown section is reusing settings and callbacks from version 2 when being enabled.
@@ -60,8 +63,9 @@ Only UM Form's single select dropdowns are supported.
 4. Version 2.3.0 CSV Field Separator selection.
 5. Version 3.1.0 Support for 5 CSV dropdowns with either 2 or 3 levels. Updated the documentation in the plugin.
 6. Version 3.2.0 Code improvements. Text file input in addition to .CSV file.
-7. Version 3.2.1 Code improvements for Members Directory,
+7. Version 3.2.1 Code improvements for Members Directory
+8. Version 3.2.2 Code improvements for Members Directory and addition of sorting options and callback logging
 
 ## Installation
 1. Install by downloading the plugin ZIP file and install as a new Plugin, which you upload in WordPress -> Plugins -> Add New -> Upload Plugin.
-2. Activate the Plugin: Ultimate Member - Three Way Dropdown options
+2. Activate the Plugin: Ultimate Member - Two and Three Way Dropdown options
