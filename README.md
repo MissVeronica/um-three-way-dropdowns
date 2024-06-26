@@ -65,6 +65,7 @@ Only UM Form's single select dropdowns are supported.
 6. Version 3.2.0 Code improvements. Text file input in addition to .CSV file.
 7. Version 3.2.1 Code improvements for Members Directory
 8. Version 3.2.2 Code improvements for Members Directory and addition of sorting options and callback logging
+9. Version 3.2.3 Code improvements for callback logging
 
 ## Installation
 1. Install by downloading the plugin ZIP file and install as a new Plugin, which you upload in WordPress -> Plugins -> Add New -> Upload Plugin.
