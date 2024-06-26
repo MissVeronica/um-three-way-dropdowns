@@ -2,7 +2,7 @@
 /**
  * Plugin Name:     Ultimate Member - Two and Three Way Dropdown options
  * Description:     Extension to Ultimate Member for defining two or three way dropdown options in a spreadsheet saved as a CSV file.
- * Version:         3.2.2
+ * Version:         3.2.3
  * Requires PHP:    7.4
  * Author:          Miss Veronica
  * License:         GPL v2 or later
@@ -75,6 +75,14 @@ Class UM_Three_Way_Dropdowns {
                                 'tab'        => 'Tabulator',
                                 'space'      => 'Blank Space',
                                 );
+
+    public $protections      = array(
+                                        'user_password-',
+                                        'confirm_user_password-',
+                                        'password-',
+                                        'user_email-',
+                                        'secondary_user_email-',
+                                    );
 
     public $spreadsheet_columns = array(
                                         0  => 'A',
@@ -734,12 +742,20 @@ Class UM_Three_Way_Dropdowns {
 
                 if ( is_array( $values )) {
 
-                    if ( isset( $values['password'] )) {
-                        $values['password'] = '******';
+                    if ( isset( $values['form_id'] )) {
+                        $form_id = sanitize_text_field( $values['form_id'] );
+
+                        foreach( $this->protections as $protect ) {
+                            if ( isset( $values[$protect . $form_id] )) {
+
+                                $trace = date_i18n( 'Y-m-d H:i:s ', current_time( 'timestamp' )) . 'Three Way Dropdowns option: Post with Registration fields skipped from logging';
+                                file_put_contents( WP_CONTENT_DIR . '/debug.log', $trace . chr(13), FILE_APPEND );
+
+                                return;
+                            }
+                        }
                     }
-                    if ( isset( $values['user_password'] )) {
-                        $values['user_password'] = '******';
-                    }
+
                     $trace .= print_r( $values, true );
 
                 } else {
@@ -1018,6 +1034,7 @@ UM()->classes['um_three_way_dropdowns'] = new UM_Three_Way_Dropdowns();
 
         return UM()->classes['um_three_way_dropdowns']->setup_custom_mid_btm_list_dropdown( $parent, '_dropdown_d', 'mid', 'btm' );
     }
+
 
 
 
