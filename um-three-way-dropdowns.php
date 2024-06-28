@@ -2,7 +2,7 @@
 /**
  * Plugin Name:     Ultimate Member - Two and Three Way Dropdown options
  * Description:     Extension to Ultimate Member for defining two or three way dropdown options in a spreadsheet saved as a CSV file.
- * Version:         3.2.3
+ * Version:         3.2.4
  * Requires PHP:    7.4
  * Author:          Miss Veronica
  * License:         GPL v2 or later
@@ -77,12 +77,12 @@ Class UM_Three_Way_Dropdowns {
                                 );
 
     public $protections      = array(
-                                        'user_password-',
-                                        'confirm_user_password-',
-                                        'password-',
-                                        'user_email-',
-                                        'secondary_user_email-',
-                                    );
+                                    'user_password-',
+                                    'confirm_user_password-',
+                                    'password-',
+                                    'user_email-',
+                                    'secondary_user_email-',
+                                );
 
     public $spreadsheet_columns = array(
                                         0  => 'A',
@@ -119,6 +119,8 @@ Class UM_Three_Way_Dropdowns {
             add_filter( 'um_settings_custom_subtabs',                              array( $this, 'um_settings_custom_subtabs_three_way_dropdowns' ), 10, 2 );
             add_filter( 'um_settings_default_form_wrapper',                        array( $this, 'um_settings_default_form_wrapper_three_way_dropdowns' ), 10, 3 );
         }
+
+        add_filter( 'um_member_directory_filter_select_options', array( $this, 'um_member_directory_filter_select_options_three_way_dropdowns' ), 10, 3 );
     }
 
     public function update_cache_option( $level, $name, $option_value, $autoload, $section ) {
@@ -242,7 +244,7 @@ Class UM_Three_Way_Dropdowns {
                 $label = isset( $value['label'] ) ? $value['label'] : $value['title'];
                 $this->selects[$meta_key] = $label . ' - ' . $meta_key;
             }
-        }
+        }        
 
         asort( $this->selects );
 
@@ -704,6 +706,14 @@ Class UM_Three_Way_Dropdowns {
             'checkbox_label' => __( 'Click to improve response times of options load.', 'ultimate-member' ),
             'conditional'    => array( 'um_three_way_dropdowns_active' . $section, '=', 1 ),
         );
+        
+        $settings_structure[] = array(
+            'id'             => 'um_three_way_dropdowns_all_dropdowns_top' . $section,
+            'type'           => 'checkbox',
+            'label'          => __( 'Load all top dropdown options', 'ultimate-member' ),
+            'checkbox_label' => __( 'Click to load all top dropdown options regardless of not selected by any User.', 'ultimate-member' ),
+            'conditional'    => array( 'um_three_way_dropdowns_active' . $section, '=', 1 ),
+        );
 
         $settings_structure[] = array(
             'id'             => 'um_three_way_dropdowns_sort_dropdowns_top' . $section,
@@ -771,6 +781,32 @@ Class UM_Three_Way_Dropdowns {
 
             file_put_contents( WP_CONTENT_DIR . '/debug.log', $trace . chr(13), FILE_APPEND );
         }
+    }
+
+    public function um_member_directory_filter_select_options_three_way_dropdowns( $options, $values_array, $attrs ) {
+
+        if ( isset( $attrs['custom_dropdown_options_source'] ) && substr( $attrs['custom_dropdown_options_source'], 0, 28 ) == 'get_custom_top_list_dropdown' ) {
+
+            $section = substr( $attrs['custom_dropdown_options_source'], 28 );
+
+            if ( in_array( $section, $this->valid_sections )) {
+
+                if ( UM()->options()->get( 'um_three_way_dropdowns_active' . $section ) == 1 ) {
+                    if ( UM()->options()->get( 'um_three_way_dropdowns_all_dropdowns_top' . $section ) == 1 ) {
+
+                        $dropdown_options = get_option( 'three_way_dropdowns_top' . $section );
+
+                        if ( UM()->options()->get( "um_three_way_dropdowns_sort_dropdowns_top{$section}" ) == 1 && is_array( $dropdown_options )) {
+                            asort( $dropdown_options );
+                        }
+
+                        $options = $dropdown_options;
+                    }
+                }
+            }
+        }
+
+        return $options;
     }
 
 
@@ -1034,7 +1070,3 @@ UM()->classes['um_three_way_dropdowns'] = new UM_Three_Way_Dropdowns();
 
         return UM()->classes['um_three_way_dropdowns']->setup_custom_mid_btm_list_dropdown( $parent, '_dropdown_d', 'mid', 'btm' );
     }
-
-
-
-
