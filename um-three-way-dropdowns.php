@@ -220,6 +220,7 @@ Class UM_Three_Way_Dropdowns {
                     <p>1. Sort top dropdown options - Click to sort ascending the top dropdown options displayed.</p>
                     <p>2. Sort mid/btm dropdown options - Click to sort ascending all mid and bottom dropdown options displayed.</p>
                     <p>3. Log the plugin\'s callback requests/replies - Click to log the plugin\'s callback requests/replies to the file .../wp-content/debug.log</p>
+                    <p>4. Load all top dropdown options - Click to load all top dropdown options regardless of not selected by any User.</p>
                     </div>';
         }
 
